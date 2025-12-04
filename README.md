@@ -131,4 +131,3 @@ MIT
 ## Credits
 
 Created by Tiberiu Ichim.
-Based on the original script by [Alba Silvente](https://github.com/dawntraoz).
