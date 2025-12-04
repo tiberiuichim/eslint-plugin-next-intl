@@ -14,15 +14,15 @@ import {
 import { loadMessages } from "./core.js";
 
 // Helper to delete a key from the nested object
-function deleteKey(obj: any, pathParts: string[]) {
+function deleteKey(obj: Record<string, unknown>, pathParts: string[]) {
   const key = pathParts[0];
   if (pathParts.length === 1) {
     delete obj[key];
     return Object.keys(obj).length === 0; // Return true if parent is now empty
   }
 
-  if (obj[key]) {
-    const isEmpty = deleteKey(obj[key], pathParts.slice(1));
+  if (obj[key] && typeof obj[key] === "object") {
+    const isEmpty = deleteKey(obj[key] as Record<string, unknown>, pathParts.slice(1));
     if (isEmpty) {
       delete obj[key];
       return Object.keys(obj).length === 0;
@@ -164,7 +164,7 @@ Options:
 
       if (Node.isCallExpression(parent)) {
         const args = parent.getArguments();
-        const argIndex = args.indexOf(ref as any);
+        const argIndex = args.indexOf(ref as unknown as Node);
         if (argIndex !== -1) {
           handleArgumentPassing(parent, argIndex, namespace, visited);
         }
@@ -180,7 +180,7 @@ Options:
           const callExpr = objLiteral.getParent();
           if (Node.isCallExpression(callExpr)) {
             const args = callExpr.getArguments();
-            const argIndex = args.indexOf(objLiteral as any);
+            const argIndex = args.indexOf(objLiteral as unknown as Node);
             if (argIndex !== -1) {
               const propName = parent.getName();
               handleArgumentPassing(
@@ -198,12 +198,13 @@ Options:
   }
 
   function handleArgumentPassing(
-    callExpr: any,
+    callExpr: Node,
     argIndex: number,
     namespace: string,
     visited: Set<Node>,
     destructuredPropName?: string,
   ) {
+    if (!Node.isCallExpression(callExpr)) return;
     const expression = callExpr.getExpression();
     const symbol = expression.getSymbol();
 

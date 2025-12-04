@@ -4,12 +4,12 @@ import path from "node:path";
 // Cache for loaded keys: "absolute/path/to/file" -> { mtimeMs, keys: Set<string> }
 const cache = new Map<string, { mtimeMs: number; keys: Set<string> }>();
 
-export function flattenKeys(obj: any, prefix = ""): string[] {
+export function flattenKeys(obj: Record<string, unknown>, prefix = ""): string[] {
   let keys: string[] = [];
   for (const key in obj) {
     if (typeof obj[key] === "object" && obj[key] !== null) {
       keys = keys.concat(
-        flattenKeys(obj[key], prefix ? `${prefix}.${key}` : key),
+        flattenKeys(obj[key] as Record<string, unknown>, prefix ? `${prefix}.${key}` : key),
       );
     } else {
       keys.push(prefix ? `${prefix}.${key}` : key);

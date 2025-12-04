@@ -1,5 +1,8 @@
 import { Rule } from "eslint";
+import * as ESTree from "estree";
 import { loadMessages } from "../core.js";
+
+type NodeWithParent = ESTree.Node & { parent: NodeWithParent };
 
 // Type definition for context options
 interface NextIntlOptions {
@@ -47,46 +50,48 @@ export const rule: Rule.RuleModule = {
     };
 
     return {
-      VariableDeclarator(node: any) {
+      VariableDeclarator(node: ESTree.Node) {
+        const varNode = node as ESTree.VariableDeclarator;
         if (
-          node.init &&
-          node.init.type === "CallExpression" &&
-          node.init.callee.type === "Identifier" &&
-          node.init.callee.name === "useTranslations"
+          varNode.init &&
+          varNode.init.type === "CallExpression" &&
+          varNode.init.callee.type === "Identifier" &&
+          varNode.init.callee.name === "useTranslations"
         ) {
           // Extract namespace
           let namespace = "";
           if (
-            node.init.arguments.length > 0 &&
-            node.init.arguments[0].type === "Literal" &&
-            typeof node.init.arguments[0].value === "string"
+            varNode.init.arguments.length > 0 &&
+            varNode.init.arguments[0].type === "Literal" &&
+            typeof (varNode.init.arguments[0] as ESTree.Literal).value === "string"
           ) {
-            namespace = node.init.arguments[0].value;
+            namespace = (varNode.init.arguments[0] as ESTree.Literal).value as string;
           }
 
           // Get declared variable 't'
-          const variables = context.sourceCode.getDeclaredVariables(node);
+          const variables = context.sourceCode.getDeclaredVariables(varNode);
           if (variables.length > 0) {
             const variable = variables[0]; // Should be the 't' variable
 
             // Check references
             variable.references.forEach((ref) => {
-              const refNode = ref.identifier as any;
+              const refNode = ref.identifier as unknown as NodeWithParent;
               // Check if it is a call expression: t(...)
               // refNode is the identifier 't'. Parent should be CallExpression
               if (
                 refNode.parent &&
                 refNode.parent.type === "CallExpression" &&
-                refNode.parent.callee === refNode
+                (refNode.parent as unknown as ESTree.CallExpression).callee === (refNode as unknown as ESTree.Identifier)
               ) {
                 // It is a call t(...)
-                const args = refNode.parent.arguments;
+                const callExpr = refNode.parent as unknown as ESTree.CallExpression;
+                const args = callExpr.arguments;
                 if (
                   args.length > 0 &&
                   args[0].type === "Literal" &&
-                  typeof args[0].value === "string"
+                  typeof (args[0] as ESTree.Literal).value === "string"
                 ) {
-                  const key = args[0].value;
+                  const key = (args[0] as ESTree.Literal).value as string;
                   const fullKey = namespace ? `${namespace}.${key}` : key;
 
                   const keys = getKeys();

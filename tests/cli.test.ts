@@ -17,7 +17,7 @@ async function runCli(args: string[] = []) {
     });
     return result;
   } catch (e) {
-    return e as any;
+    return e as Record<string, unknown>;
   }
 }
 
@@ -159,7 +159,7 @@ describe("CLI", () => {
     const content = JSON.parse(fs.readFileSync(messagesPath, "utf-8"));
     expect(content).toEqual({ common: { greeting: "Hello" } });
     // Ensure 'unused' is gone from 'common'
-    expect((content.common as any).unused).toBeUndefined();
+    expect((content.common as Record<string, unknown>).unused).toBeUndefined();
   }, 10000);
 
   it("should warn about dynamic keys", async () => {
