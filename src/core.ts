@@ -9,7 +9,7 @@ export function flattenKeys(obj: any, prefix = ""): string[] {
   for (const key in obj) {
     if (typeof obj[key] === "object" && obj[key] !== null) {
       keys = keys.concat(
-        flattenKeys(obj[key], prefix ? `${prefix}.${key}` : key)
+        flattenKeys(obj[key], prefix ? `${prefix}.${key}` : key),
       );
     } else {
       keys.push(prefix ? `${prefix}.${key}` : key);
@@ -18,7 +18,11 @@ export function flattenKeys(obj: any, prefix = ""): string[] {
   return keys;
 }
 
-export function loadMessages(cwd: string, messagesDir: string, locale: string): Set<string> {
+export function loadMessages(
+  cwd: string,
+  messagesDir: string,
+  locale: string,
+): Set<string> {
   const absoluteMessagesDir = path.resolve(cwd, messagesDir);
   const filePath = path.join(absoluteMessagesDir, `${locale}.json`);
 
@@ -38,7 +42,7 @@ export function loadMessages(cwd: string, messagesDir: string, locale: string): 
     const content = fs.readFileSync(filePath, "utf-8");
     const json = JSON.parse(content);
     const keys = new Set(flattenKeys(json));
-    
+
     cache.set(filePath, { mtimeMs: stats.mtimeMs, keys });
     return keys;
   } catch (error) {

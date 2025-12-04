@@ -1,6 +1,7 @@
 {
   "name": "eslint-plugin-next-intl",
   "version": "0.0.1",
+  "type": "module",
   "description": "ESLint plugin and CLI for next-intl message validation",
   "main": "dist/index.js",
   "bin": {
@@ -8,7 +9,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "type-check": "tsc --noEmit",
+    "type-check": "tsc --noEmit -p tsconfig.check.json",
     "lint": "eslint .",
     "test": "vitest run",
     "prepublishOnly": "npm run build"

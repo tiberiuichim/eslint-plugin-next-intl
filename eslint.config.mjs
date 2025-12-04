@@ -4,7 +4,10 @@ import tsPlugin from '@typescript-eslint/eslint-plugin';
 
 export default [
   {
-    files: ["src/**/*.ts"],
+    ignores: ["dist/", "artifacts/", "coverage/", "debug-*.mjs"],
+  },
+  {
+    files: ["**/*.ts"],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -13,8 +16,18 @@ export default [
       },
     },
     plugins: {
-      "eslint-plugin": eslintPlugin,
       "@typescript-eslint": tsPlugin,
+    },
+    rules: {
+      ...tsPlugin.configs.recommended.rules,
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    },
+  },
+  {
+    files: ["src/**/*.ts"],
+    plugins: {
+      "eslint-plugin": eslintPlugin,
     },
     rules: {
       ...eslintPlugin.configs.recommended.rules,

@@ -25,24 +25,24 @@ export const rule: Rule.RuleModule = {
           if (variables.length > 0) {
             const variable = variables[0];
             variable.references.forEach((ref) => {
-               const refNode = ref.identifier as any;
-               if (
-                 refNode.parent &&
-                 refNode.parent.type === "CallExpression" &&
-                 refNode.parent.callee === refNode
-               ) {
-                 const args = refNode.parent.arguments;
-                 if (args.length > 0) {
-                   const arg = args[0];
-                   // Warn if not a simple string literal
-                   if (arg.type !== "Literal" || typeof arg.value !== "string") {
-                     context.report({
-                       node: arg,
-                       messageId: "dynamicKey",
-                     });
-                   }
-                 }
-               }
+              const refNode = ref.identifier as any;
+              if (
+                refNode.parent &&
+                refNode.parent.type === "CallExpression" &&
+                refNode.parent.callee === refNode
+              ) {
+                const args = refNode.parent.arguments;
+                if (args.length > 0) {
+                  const arg = args[0];
+                  // Warn if not a simple string literal
+                  if (arg.type !== "Literal" || typeof arg.value !== "string") {
+                    context.report({
+                      node: arg,
+                      messageId: "dynamicKey",
+                    });
+                  }
+                }
+              }
             });
           }
         }

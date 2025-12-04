@@ -31,8 +31,9 @@ export const rule: Rule.RuleModule = {
   create(context) {
     const settings = (context.settings?.["next-intl"] || {}) as NextIntlOptions;
     const options = (context.options[0] || {}) as NextIntlOptions;
-    
-    const messagesDir = options.messagesDir || settings.messagesDir || "src/messages";
+
+    const messagesDir =
+      options.messagesDir || settings.messagesDir || "src/messages";
     const sourceLocale = options.sourceLocale || settings.sourceLocale || "en";
     const cwd = context.cwd || process.cwd();
 
@@ -67,35 +68,39 @@ export const rule: Rule.RuleModule = {
           const variables = context.sourceCode.getDeclaredVariables(node);
           if (variables.length > 0) {
             const variable = variables[0]; // Should be the 't' variable
-            
+
             // Check references
             variable.references.forEach((ref) => {
-               const refNode = ref.identifier as any;
-               // Check if it is a call expression: t(...)
-               // refNode is the identifier 't'. Parent should be CallExpression
-               if (
-                 refNode.parent &&
-                 refNode.parent.type === "CallExpression" &&
-                 refNode.parent.callee === refNode
-               ) {
-                 // It is a call t(...)
-                 const args = refNode.parent.arguments;
-                 if (args.length > 0 && args[0].type === "Literal" && typeof args[0].value === "string") {
-                   const key = args[0].value;
-                   const fullKey = namespace ? `${namespace}.${key}` : key;
-                   
-                   const keys = getKeys();
-                   if (!keys.has(fullKey)) {
-                     context.report({
-                       node: args[0],
-                       messageId: "missingKey",
-                       data: {
-                         key: fullKey,
-                       },
-                     });
-                   }
-                 }
-               }
+              const refNode = ref.identifier as any;
+              // Check if it is a call expression: t(...)
+              // refNode is the identifier 't'. Parent should be CallExpression
+              if (
+                refNode.parent &&
+                refNode.parent.type === "CallExpression" &&
+                refNode.parent.callee === refNode
+              ) {
+                // It is a call t(...)
+                const args = refNode.parent.arguments;
+                if (
+                  args.length > 0 &&
+                  args[0].type === "Literal" &&
+                  typeof args[0].value === "string"
+                ) {
+                  const key = args[0].value;
+                  const fullKey = namespace ? `${namespace}.${key}` : key;
+
+                  const keys = getKeys();
+                  if (!keys.has(fullKey)) {
+                    context.report({
+                      node: args[0],
+                      messageId: "missingKey",
+                      data: {
+                        key: fullKey,
+                      },
+                    });
+                  }
+                }
+              }
             });
           }
         }

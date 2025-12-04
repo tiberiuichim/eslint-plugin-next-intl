@@ -41,7 +41,7 @@ describe("CLI", () => {
     // Setup en.json
     fs.writeFileSync(
       path.join(TEMP_DIR, "src/messages/en.json"),
-      JSON.stringify({ common: { greeting: "Hello" } }, null, 2)
+      JSON.stringify({ common: { greeting: "Hello" } }, null, 2),
     );
 
     // Setup component
@@ -53,11 +53,11 @@ describe("CLI", () => {
         const t = useTranslations('common');
         return <div>{t('greeting')}</div>;
       }
-      `
+      `,
     );
 
     const { stdout, exitCode } = await runCli(["--check"]);
-    
+
     expect(stdout).toContain("Found 1 defined keys");
     expect(stdout).toContain("Found 1 unique used keys");
     expect(stdout).toContain("All checks passed!");
@@ -68,7 +68,7 @@ describe("CLI", () => {
     // Setup en.json
     fs.writeFileSync(
       path.join(TEMP_DIR, "src/messages/en.json"),
-      JSON.stringify({ common: { greeting: "Hello" } }, null, 2)
+      JSON.stringify({ common: { greeting: "Hello" } }, null, 2),
     );
 
     // Setup component using missing key
@@ -80,7 +80,7 @@ describe("CLI", () => {
         const t = useTranslations('common');
         return <div>{t('missing.key')}</div>;
       }
-      `
+      `,
     );
 
     const { stdout, stderr, exitCode } = await runCli(["--check"]);
@@ -95,7 +95,11 @@ describe("CLI", () => {
     // Setup en.json with unused key
     fs.writeFileSync(
       path.join(TEMP_DIR, "src/messages/en.json"),
-      JSON.stringify({ common: { greeting: "Hello", unused: "Unused" } }, null, 2)
+      JSON.stringify(
+        { common: { greeting: "Hello", unused: "Unused" } },
+        null,
+        2,
+      ),
     );
 
     // Setup component
@@ -107,7 +111,7 @@ describe("CLI", () => {
         const t = useTranslations('common');
         return <div>{t('greeting')}</div>;
       }
-      `
+      `,
     );
 
     const { stdout, exitCode } = await runCli(["--check"]);
@@ -122,11 +126,15 @@ describe("CLI", () => {
 
   it("should fix unused keys when --fix is passed", async () => {
     const messagesPath = path.join(TEMP_DIR, "src/messages/en.json");
-    
+
     // Setup en.json with unused key
     fs.writeFileSync(
       messagesPath,
-      JSON.stringify({ common: { greeting: "Hello", unused: "Unused" } }, null, 2)
+      JSON.stringify(
+        { common: { greeting: "Hello", unused: "Unused" } },
+        null,
+        2,
+      ),
     );
 
     // Setup component
@@ -138,7 +146,7 @@ describe("CLI", () => {
         const t = useTranslations('common');
         return <div>{t('greeting')}</div>;
       }
-      `
+      `,
     );
 
     const { stdout, exitCode } = await runCli(["--fix"]);
@@ -158,7 +166,7 @@ describe("CLI", () => {
     // Setup en.json
     fs.writeFileSync(
       path.join(TEMP_DIR, "src/messages/en.json"),
-      JSON.stringify({ greeting: "Hello" }, null, 2)
+      JSON.stringify({ greeting: "Hello" }, null, 2),
     );
 
     // Setup component with dynamic usage
@@ -171,12 +179,14 @@ describe("CLI", () => {
         const key = 'greeting';
         return <div>{t(key)}</div>;
       }
-      `
+      `,
     );
 
     const { stderr, exitCode } = await runCli(["--check"]);
 
-    expect(stderr).toContain("dynamic usages which cannot be statically analyzed");
+    expect(stderr).toContain(
+      "dynamic usages which cannot be statically analyzed",
+    );
     expect(exitCode).toBe(0);
   }, 10000);
 });

@@ -1,4 +1,4 @@
-import { describe, it, vi, afterEach } from "vitest";
+import { describe, it, vi } from "vitest";
 import { RuleTester } from "eslint";
 import { rule } from "../../src/rules/no-missing-keys.js";
 
@@ -6,7 +6,7 @@ import { rule } from "../../src/rules/no-missing-keys.js";
 // Note: We need to hoist the mock or use doMock
 vi.mock("../../src/core.js", () => {
   return {
-    loadMessages: vi.fn((cwd, dir, locale) => {
+    loadMessages: vi.fn((_cwd, _dir, _locale) => {
       // Returns a fixed set of keys for testing
       return new Set(["common.greeting", "auth.login", "nested.key"]);
     }),
@@ -14,7 +14,6 @@ vi.mock("../../src/core.js", () => {
 });
 
 const ruleTester = new RuleTester({
-  // @ts-ignore
   parser: require.resolve("@typescript-eslint/parser"),
   parserOptions: {
     ecmaVersion: 2020,

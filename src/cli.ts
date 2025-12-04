@@ -70,11 +70,15 @@ Options:
 
   // 1. Load keys
   const allDefinedKeys = loadMessages(cwd, messagesDir, sourceLocale);
-  console.log(`Found ${allDefinedKeys.size} defined keys in ${sourceLocale}.json`);
+  console.log(
+    `Found ${allDefinedKeys.size} defined keys in ${sourceLocale}.json`,
+  );
 
   if (allDefinedKeys.size === 0) {
-      console.error(`No keys found or file missing: ${path.join(messagesDir, sourceLocale + ".json")}`);
-      process.exit(1);
+    console.error(
+      `No keys found or file missing: ${path.join(messagesDir, sourceLocale + ".json")}`,
+    );
+    process.exit(1);
   }
 
   // 2. Analyze code
@@ -157,7 +161,7 @@ Options:
           continue;
         }
       }
-      
+
       if (Node.isCallExpression(parent)) {
         const args = parent.getArguments();
         const argIndex = args.indexOf(ref as any);
@@ -298,40 +302,7 @@ Options:
       const expression = callExpr.getExpression();
       if (expression.getText() === "useTranslations") {
         const args = callExpr.getArguments();
-        let namespace = "default"; // Wait, default namespace? Usually useTranslations() implies strict check? 
-        // In next-intl, useTranslations('Namespace') or useTranslations()
-        // If useTranslations() is called without args, it might inherit, but for static analysis we might need to track it or assume root?
-        // The original script defaulted to "default". Let's stick to original logic unless we see reason to change.
-        // Original script: let namespace = "default"; ... if (args.length > 0) namespace = arg...
-        // Actually, if namespace is "default", then keys are "key". If namespace is "ns", keys are "ns.key".
-        // If keys in en.json are flattened, "ns.key" is correct.
-
-        // Note: If en.json has top level keys, "default" prefix might be wrong if we just concat.
-        // Original script: const fullKey = namespace ? `${namespace}.${args[0]}` : args[0];
-        // But wait, original script set namespace="default" initially.
-        // Let's look at original script:
-        // let namespace = "default";
-        // if (args.length > 0) ... namespace = arg.getLiteralValue();
-        // ...
-        // const fullKey = namespace ? `${namespace}.${args[0]}` ...
-        
-        // This means if I do useTranslations('about'), namespace is 'about'. T call t('title') -> 'about.title'.
-        // If I do useTranslations(), namespace is 'default'. T call t('title') -> 'default.title'.
-        // Does 'default' actually exist in en.json? Or is it a bug in original script?
-        // The helper `flattenKeys` returns "a.b.c".
-        // If useTranslations() is used, usually it means looking up from root? Or maybe the user has a "default" namespace?
-        // I will assume the user knows what they are doing and stick to the original logic.
-        // Wait, if args.length === 0, namespace is 'default'.
-        // If I change it to "", then fullKey = ".title" which is wrong.
-        // If useTranslations() (no args) is used, it usually means "global" scope? 
-        // In next-intl, useTranslations() without args is not standard unless configured?
-        // Docs say: const t = useTranslations('Index');
-        // I'll stick to "default" but maybe I should verify if that's intended.
-        // If I look at `flattenKeys` in `core.ts`, it produces `key` or `prefix.key`.
-        // If `en.json` has `{ "title": "Hi" }`, keys is `['title']`.
-        // If code has `useTranslations(); t('title')` -> `default.title`. This won't match.
-        // So `useTranslations()` without args seems unsupported or assumes a "default" key?
-        // I'll keep it as is.
+        let namespace = "default";
 
         if (args.length > 0) {
           const arg = args[0];
@@ -371,7 +342,7 @@ Options:
     // In original script, there was logic: "default" namespace issue?
     // If I used `useTranslations('common')` -> `common.title`.
     // If `en.json` has `common: { title: ... }`, it matches.
-    
+
     if (!allDefinedKeys.has(usedKey)) {
       missingKeys.add(usedKey);
     }
