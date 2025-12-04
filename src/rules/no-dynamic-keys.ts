@@ -4,8 +4,11 @@ export const rule: Rule.RuleModule = {
   meta: {
     type: "suggestion",
     docs: {
-      description: "Warn about dynamic translation keys",
+      description: "disallow dynamic translation keys",
       recommended: true,
+    },
+    messages: {
+      dynamicKey: "Dynamic keys cannot be statically analyzed.",
     },
     schema: [],
   },
@@ -35,7 +38,7 @@ export const rule: Rule.RuleModule = {
                    if (arg.type !== "Literal" || typeof arg.value !== "string") {
                      context.report({
                        node: arg,
-                       message: "Dynamic keys cannot be statically analyzed.",
+                       messageId: "dynamicKey",
                      });
                    }
                  }

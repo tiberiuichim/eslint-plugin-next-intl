@@ -3,7 +3,6 @@ import tsParser from '@typescript-eslint/parser';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 
 export default [
-  eslintPlugin.configs.recommended,
   {
     files: ["src/**/*.ts"],
     languageOptions: {
@@ -14,10 +13,12 @@ export default [
       },
     },
     plugins: {
+      "eslint-plugin": eslintPlugin,
       "@typescript-eslint": tsPlugin,
     },
     rules: {
-       'eslint-plugin/require-meta-docs-description': 'error',
+      ...eslintPlugin.configs.recommended.rules,
+      'eslint-plugin/require-meta-docs-description': 'error',
     },
   },
 ];

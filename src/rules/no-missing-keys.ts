@@ -11,8 +11,11 @@ export const rule: Rule.RuleModule = {
   meta: {
     type: "problem",
     docs: {
-      description: "Disallow missing translation keys",
+      description: "disallow missing translation keys",
       recommended: true,
+    },
+    messages: {
+      missingKey: "Missing translation key: '{{key}}'",
     },
     schema: [
       {
@@ -85,7 +88,10 @@ export const rule: Rule.RuleModule = {
                    if (!keys.has(fullKey)) {
                      context.report({
                        node: args[0],
-                       message: `Missing translation key: '${fullKey}'`,
+                       messageId: "missingKey",
+                       data: {
+                         key: fullKey,
+                       },
                      });
                    }
                  }
