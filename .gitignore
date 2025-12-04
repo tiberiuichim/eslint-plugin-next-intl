@@ -1,0 +1,9 @@
+node_modules/
+dist/
+coverage/
+.DS_Store
+*.log
+.env
+.vscode/
+tests/temp-cli-test/
+prettier-plugin-typescript-imports/
